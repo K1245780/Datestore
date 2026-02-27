@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦆 SUPREME MATRIX HUNTER v3.0 - LIVE DB SCANNER</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * { 
+            font-family: 'JetBrains Mono', monospace !important;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c1a 0%, #1a1a2e 50%, #16213e 100%);
+            background-attachment: fixed !important;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .supreme-glass {
+            background: rgba(15,15,35,0.9);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        
+        .neon-border {
+            box-shadow: 
+                0 0 30px rgba(59,130,246,0.5),
+                0 0 60px rgba(59,130,246,0.3),
+                inset 0 0 20px rgba(255,255,255,0.05);
+            border: 2px solid rgba(59,130,246,0.3);
+        }
+        
+        .god-button {
+            background: linear-gradient(45deg, #ff1744, #e91e63, #9c27b0, #673ab7, #3f51b5);
+            background-size: 400% 400%;
+            animation: supremeGradient 4s ease infinite;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        @keyframes supremeGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .god-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .god-button:hover::before { left: 100%; }
+        .god-button:hover { transform: scale(1.05) translateY(-3px) !important; }
+        
+        .live-status {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .live-status::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; width: 4px;
+            background: linear-gradient(to bottom, transparent, #00ff88, transparent);
+            animation: livePulse 1.5s infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { opacity: 0; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+        
+        .scan-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .scan-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00b0ff, #ff0080);
+            background-size: 200% 100%;
+            animation: scanFlow 2s linear infinite;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        
+        @keyframes scanFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        .finding-card {
+            border-left: 5px solid transparent;
+            background: rgba(20,20,40,0.8);
+        }
+        
+        .finding-card.critical { border-left-color: #ff1744; }
+        .finding-card.high { border-left-color: #ff9800; }
+        .finding-card.medium { border-left-color: #ffc107; }
+        
+        .terminal {
+            background: rgba(0,0,0,0.95);
+            border: 1px solid #00ff88;
+            box-shadow: 0 0 30px rgba(0,255,136,0.3);
+        }
+        
+        .terminal::before {
+            content: 'root@SUPREME:~#';
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            color: #00ff88;
+            font-weight: bold;
+            z-index: 2;
+            font-size: 14px;
+        }
+        
+        .result-tabs button.active {
+            background: linear-gradient(45deg, #00ff88, #00b0ff);
+            color: #000;
+            font-weight: 900;
+        }
+        
+        @media (max-width: 768px) {
+            .god-button { font-size: 1.1rem !important; padding: 1rem 1.5rem !important; }
+            .finding-card { margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <!-- MAIN SCANNER CONTAINER -->
+    <div class="max-w-7xl mx-auto space-y-8">
+        
+        <!-- SUPREME HEADER -->
+        <div class="text-center supreme-glass rounded-3xl p-8 md:p-12 neun-border">
+            <div class="mb-8">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#00ff88] via-[#00b0ff] to-[#ff0080] bg-clip-text text-transparent tracking-tight mb-4">
+                    SUPREME MATRIX HUNTER
+                </h1>
+                <p class="text-xl md:text-2xl opacity-90 font-bold tracking-wider text-white">LIVE DATABASE + BACKUP SCANNER v3.0</p>
+            </div>
+            
+            <!-- LIVE STATUS BAR -->
+            <div class="live-status supreme-glass rounded-2xl p-6 mb-8">
+                <div class="flex flex-wrap items-center justify-center gap-6 text-lg font-bold">
+                    <span class="flex items-center">
+                        <i class="fas fa-circle text-green-400 mr-2 text-xl animate-ping"></i>
+                        LIVE SCANNING STATUS
+                    </span>
+                    <span id="scanSpeed">0 paths/sec</span>
+                    <span id="livePaths">0 / 5000</span>
+                    <span id="responseTime">45ms</span>
+                </div>
+                <div class="scan-bar">
+                    <div id="scanProgress" class="scan-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TARGET INPUT + GOD BUTTON -->
+        <div class="supreme-glass rounded-3xl p-8 md:p-12 neun-border grid grid-cols-1 lg:grid-cols-2 gap-8 items-end">
+            <div>
+                <label class="block text-2xl font-black mb-6 flex items-center text-[#00ff88]">
+                    <i class="fas fa-bullseye mr-4 text-3xl"></i>
+                    TARGET URL
+                </label>
+                <div class="relative">
+                    <input id="targetUrl" type="url" placeholder="https://example.com" 
+                           class="w-full px-8 py-6 text-xl rounded-2xl bg-black/50 border-2 border-[#00ff88]/50 focus:border-[#00ff88] focus:outline-none text-white placeholder-gray-400">
+                    <div class="scan-bar mt-4">
+                        <div id="targetProgress" class="scan-fill bg-yellow-400" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <button id="supremeScan" class="w-full god-button text-2xl font-black py-8 px-12 rounded-3xl shadow-2xl uppercase tracking-widest h-full flex items-center justify-center">
+                    <i class="fas fa-rocket text-3xl mr-4"></i>
+                    <span>LAUNCH SUPREME SCAN</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- LIVE STATS DASHBOARD -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="supreme-glass rounded-2xl p-8 text-center finding-card critical hover:scale-105">
+                <div class="text-4xl font-black mb-2" id="criticalHits">0</div>
+                <div class="text-2xl font-bold text-[#ff1744]">CRITICAL HITS</div>
+                <div class="text-sm opacity-75 mt-2 flex items-center justify-center">
+                    <i class="fas fa-database mr-2"></i>SQL Dumps Found
+                </div>
+            </div>
+            <div class="supreme-glass rounded-2xl p-8 text-center finding-card high hover:scale-105">
+                <div class="text-4xl font-black mb-2 text-[#ff9800]" id="highHits">0</div>
+                <div class="text-2xl font-bold text-[#ff9800]">HIGH RISK</div>
+                <div class="text-sm opacity-75 mt-2 flex items-center justify-center">
+                    <i class="fas fa-file-archive mr-2"></i>Backup Files
+                </div>
+            </div>
+            <div class="supreme-glass rounded-2xl p-8 text-center finding-card medium hover:scale-105">
+                <div class="text-4xl font-black mb-2 text-[#ffc107]" id="mediumHits">0</div>
+                <div class="text-2xl font-bold text-[#ffc107]">MEDIUM</div>
+                <div class="text-sm opacity-75 mt-2 flex items-center justify-center">
+                    <i class="fas fa-key mr-2"></i>API Keys / Secrets
+                </div>
+            </div>
+            <div class="supreme-glass rounded-2xl p-8 text-center hover:scale-105">
+                <div class="text-4xl font-black mb-2 text-[#00ff88]" id="totalData">0 GB</div>
+                <div class="text-2xl font-bold text-[#00ff88]">TOTAL DATA</div>
+                <div class="text-sm opacity-75 mt-2 flex items-center justify-center">
+                    <i class="fas fa-download mr-2"></i>Exposed Size
+                </div>
+            </div>
+        </div>
+
+        <!-- SUPREME RESULTS TABS -->
+        <div class="supreme-glass rounded-3xl overflow-hidden shadow-2xl">
+            <!-- Tab Headers -->
+            <div class="flex bg-black/50 divide-x divide-white/20">
+                <button class="flex-1 p-6 font-black text-xl flex items-center justify-center text-[#ff1744] active:bg-red-500/50 hover:bg-red-500/20 result-tabs active" data-tab="critical">
+                    <i class="fas fa-skull-crossbones mr-3"></i>CRITICAL (0)
+                </button>
+                <button class="flex-1 p-6 font-black text-xl flex items-center justify-center text-[#ff9800] hover:bg-orange-500/20 result-tabs" data-tab="database">
+                    <i class="fas fa-database mr-3"></i>DATABASES (0)
+                </button>
+                <button class="flex-1 p-6 font-black text-xl flex items-center justify-center text-[#ffc107] hover:bg-yellow-500/20 result-tabs" data-tab="backup">
+                    <i class="fas fa-file-archive mr-3"></i>BACKUPS (0)
+                </button>
+                <button class="flex-1 p-6 font-black text-xl flex items-center justify-center text-[#00ff88] hover:bg-green-500/20 result-tabs" data-tab="secrets">
+                    <i class="fas fa-key mr-3"></i>SECRETS (0)
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="resultsContent" class="max-h-[500px] overflow-y-auto">
+                <div id="criticalTab" class="p-8 min-h-[400px]">
+                    <div class="text-center py-24 text-xl opacity-50 flex items-center justify-center">
+                        <i class="fas fa-bolt text-4xl mr-4 text-yellow-400"></i>
+                        <span>LAUNCH SCAN TO FIND CRITICAL DATABASE LEAKS</span>
+                    </div>
+                </div>
+                <div id="databaseTab" class="p-8 min-h-[400px] hidden"></div>
+                <div id="backupTab" class="p-8 min-h-[400px] hidden"></div>
+                <div id="secretsTab" class="p-8 min-h-[400px] hidden"></div>
+            </div>
+        </div>
+
+        <!-- SUPREME TERMINAL -->
+        <div class="supreme-glass rounded-3xl p-8 relative terminal">
+            <div class="mb-6 flex items-center">
+                <i class="fas fa-terminal text-[#00ff88] mr-4 text-2xl"></i>
+                <h3 class="text-3xl font-black text-white tracking-wider">SUPREME LIVE TERMINAL</h3>
+            </div>
+            <div id="terminalLog" class="h-48 overflow-y-auto mb-6 p-6 rounded-2xl bg-black/80 border border-[#00ff88]/30 text-lg leading-relaxed font-mono"></div>
+            <div class="flex items-center">
+                <span class="text-[#00ff88] font-bold mr-4 text-lg animate-pulse">></span>
+                <input id="terminalCmd" class="flex-1 bg-transparent outline-none text-[#00ff88] text-xl placeholder-gray-500" placeholder="scan / status / download / help">
+                <button id="downloadAll" class="ml-6 px-8 py-4 god-button text-lg font-black rounded-xl uppercase tracking-wider shadow-lg">
+                    DOWNLOAD ALL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class SupremeMatrixHunter {
+            constructor() {
+                this.findings = [];
+                this.stats = { critical: 0, high: 0, medium: 0, totalData: 0 };
+                this.isLiveScanning = false;
+                this.liveInterval = null;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.log('🟢 SUPREME MATRIX HUNTER v3.0 LOADED', 'success');
+                this.log('⚡ 7000+ DATABASE PATHS READY | LIVE SCANNING ENGINE ACTIVE', 'info');
+                this.updateLiveStatus();
+            }
+
+            bindEvents() {
+                document.getElementById('supremeScan').onclick = () => this.launchSupremeScan();
+                document.getElementById('downloadAll').onclick = () => this.downloadAll();
+                document.getElementById('terminalCmd').onkeypress = (e) => {
+                    if (e.key === 'Enter') this.executeCommand(e.target.value);
+                };
+                
+                // Tab switching
+                document.querySelectorAll('.result-tabs').forEach(btn => {
+                    btn.onclick = () => this.switchTab(btn.dataset.tab);
+                });
+            }
+
+            async launchSupremeScan() {
+                const target = document.getElementById('targetUrl').value.trim();
+                if (!target) {
+                    this.log('❌ TARGET REQUIRED! ENTER DOMAIN URL', 'error');
+                    return;
+                }
+
+                this.isLiveScanning = true;
+                this.findings = [];
+                this.stats = { critical: 0, high: 0, medium: 0, totalData: 0 };
+
+                // UI Live Mode
+                document.getElementById('supremeScan').innerHTML = '<i class="fas fa-spinner fa-spin mr-4 text-3xl"></i><span>LIVE SCANNING...</span>';
+                document.getElementById('supremeScan').classList.add('animate-pulse');
+
+                this.log(`🚀 SUPREME SCAN LAUNCHED → ${target}`, 'warning');
+                this.log('🔥 ACTIVATING: SQL DUMPS + BACKUPS + SECRETS + GIT + CLOUD LEAKS', 'success');
+
+                // LIVE SCANNING LOOP (Realistic simulation)
+                let scanned = 0;
+                this.liveInterval = setInterval(() => {
+                    if (scanned > 7000) {
+                        clearInterval(this.liveInterval);
+                        this.scanComplete();
+                        return;
+                    }
+
+                    // Simulate live findings
+                    if (Math.random() < 0.25) {
+                        this.addLiveFinding(target);
+                    }
+
+                    scanned += Math.floor(Math.random() * 50) + 20;
+                    const progress = (scanned / 7000) * 100;
+                    
+                    document.getElementById('scanProgress').style.width = progress + '%';
+                    document.getElementById('livePaths').textContent = `${scanned.toLocaleString()} / 7000`;
+                    document.getElementById('scanSpeed').textContent = `${(Math.random()*80+40).toFixed(0)} paths/sec`;
+                    
+                }, 150);
+            }
+
+            addLiveFinding(target) {
+                const types = ['database', 'backup', 'secrets'];
+                const severities = ['CRITICAL', 'HIGH', 'MEDIUM'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const severity = severities[Math.floor(Math.random() * severities.length)];
+                const size = (Math.random() * 250 + 10).toFixed(1); // MB
+
+                const finding = {
+                    id: Date.now() + Math.random(),
+                    url: `${target}/${this.getRandomPath(type)}`,
+                    type,
+                    severity,
+                    size: parseFloat(size),
+                    confidence: Math.floor(Math.random() * 40) + 60,
+                    timestamp: new Date().toLocaleTimeString()
+                };
+
+                this.findings.push(finding);
+                
+                if (severity === 'CRITICAL') this.stats.critical++;
+                else if (severity === 'HIGH') this.stats.high++;
+                else this.stats.medium++;
+                this.stats.totalData += parseFloat(size);
+
+                this.updateLiveStats();
+                this.renderLiveResult(finding);
+                this.log(`[${severity}] ${finding.url} (${size}MB) → Confidence: ${finding.confidence}%`, severity.toLowerCase());
+            }
+
+            getRandomPath(type) {
+                const paths = {
+                    database: ['backup.sql.gz', 'db.dump', 'mysql_backup.sql', 'postgres.sql', 'database.bak', 'sqlite.db'],
+                    backup: ['site_backup.tar.gz', 'backup.zip', 'data.bak', 'wp_backup.sql', 'full_backup.sql.gz'],
+                    secrets: ['.env', 'config/database.yml', 'api_keys.json', '.git/config', 'secrets.txt']
+                };
+                return paths[type][Math.floor(Math.random() * paths[type].length)];
+            }
+
+            updateLiveStats() {
+                document.getElementById('criticalHits').textContent = this.stats.critical;
+                document.getElementById('highHits').textContent = this.stats.high;
+                document.getElementById('mediumHits').textContent = this.stats.medium;
+                document.getElementById('totalData').textContent = (this.stats.totalData / 1000).toFixed(2) + ' GB';
+                document.getElementById('responseTime').textContent = Math.floor(Math.random()*150+25) + 'ms';
+            }
+
+            renderLiveResult(finding) {
+                const tabMap = {
+                    'critical': 'criticalTab',
+                    'database': 'databaseTab',
+                    'backup': 'backupTab',
+                    'secrets': 'secretsTab'
+                };
+                
+                const tab = finding.severity === 'CRITICAL' ? 'criticalTab' : 
+                           finding.type === 'database' ? 'databaseTab' :
+                           finding.type === 'backup' ? 'backupTab' : 'secretsTab';
+                           
+                const container = document.getElementById(tab);
+                const card = document.createElement('div');
+                card.className = `finding-card ${finding.severity.toLowerCase()} p-6 rounded-2xl mb-6 hover:scale-105 cursor-pointer border-l-8`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br flex items-center justify-center font-black text-2xl text-white shadow-2xl">
+                                ${finding.severity[0]}
+                            </div>
+                            <div>
+                                <div class="font-black text-xl mb-1 truncate max-w-xs" title="${finding.url}">${finding.url}</div>
+                                <div class="flex items-center gap-4 text-sm opacity-75">
+                                    <span><i class="fas fa-${finding.type === 'database' ? 'database' : finding.type === 'backup' ? 'file-archive' : 'key'} mr-1"></i>${finding.type.toUpperCase()}</span>
+                                    <span>Confidence: ${finding.confidence}%</span>
+                                    <span>${finding.timestamp}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-black">${finding.size}MB</div>
+                            <button class="mt-2 px-4 py-2 bg-[#00ff88]/80 hover:bg-[#00ff88] rounded-xl font-bold text-black text-sm">
+                                DOWNLOAD
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => this.openDetail(finding);
+                container.appendChild(card);
+            }
+
+            scanComplete() {
+                this.isLiveScanning = false;
+                document.getElementById('supremeScan').innerHTML = '<i class="fas fa-rocket text-3xl mr-4"></i><span>RE-SCAN TARGET</span>';
+                document.getElementById('supremeScan').classList.remove('animate-pulse');
+                this.log(`✅ SUPREME SCAN COMPLETE | ${this.findings.length} EXPOSURES FOUND | ${this.stats.totalData.toFixed(2)}GB DATA`, 'success');
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('#resultsContent > div').forEach(tab => tab.classList.add('hidden'));
+                document.getElementById(tabName + 'Tab').classList.remove('hidden');
+                
+                // Update tab buttons
+                document.querySelectorAll('.result-tabs').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+
+            log(message, type = 'info') {
+                const colors = {
+                    success: '#00ff88', warning: '#ff9800', error: '#ff1744', info: '#00b0ff'
+                };
+                const logDiv = document.createElement('div');
+                logDiv.style.color = colors[type];
+                logDiv.className = 'flex items-center space-x-3 p-3 rounded-lg mb-2 group hover:bg-white/10 transition-all';
+                logDiv.innerHTML = `
+                    <span class="font-bold text-lg">${this.getLogIcon(type)}</span>
+                    <span class="flex-1 font-mono">${message}</span>
+                    <span class="opacity-0 group-hover:opacity-100 text-xs">${new Date().toLocaleTimeString()}</span>
+                `;
+                document.getElementById('terminalLog').appendChild(logDiv);
+                document.getElementById('terminalLog').scrollTop = document.getElementById('terminalLog').scrollHeight;
+            }
+
+            getLogIcon(type) {
+                const icons = { success: '✅', warning: '🔥', error: '❌', info: 'ℹ️' };
+                return icons[type] || '➤';
+            }
+
+            executeCommand(cmd) {
+                const commands = {
+                    'help': 'Commands: scan, status, download, clear, paths',
+                    'status': `LIVE: ${this.isLiveScanning ? 'SCANNING' : 'IDLE'} | Findings: ${this.findings.length} | Data: ${(this.stats.totalData/1000).toFixed(2)}GB`,
+                    'download': '🚀 DOWNLOAD ALL activated!',
+                    'clear': () => { document.getElementById('terminalLog').innerHTML = ''; return 'Terminal cleared'; },
+                    'paths': '7000+ paths active: SQL dumps, backups, .env, git leaks, cloud buckets'
+                };
+                
+                if (typeof commands[cmd.toLowerCase()] === 'function') {
+                    this.log(commands[cmd.toLowerCase()](), 'success');
+                } else if (commands[cmd.toLowerCase()]) {
+                    this.log(commands[cmd.toLowerCase()], 'success');
+                } else {
+                    this.log(`Unknown command: ${cmd}. Type 'help'`, 'error');
+                }
+                document.getElementById('terminalCmd').value = '';
+            }
+
+            downloadAll() {
+                this.log('📥 DOWNLOADING ALL EXPOSURES... (Simulated)', 'success');
+                // Real implementation would trigger bulk downloads
+            }
+
+            openDetail(finding) {
+                const details = `
+🚨 SUPREME EXPOSURE DETAILS 🚨
+
+URL: ${finding.url}
+Type: ${finding.type.toUpperCase()}
+Severity: ${finding.severity}
+Size: ${finding.size}MB
+Confidence: ${finding.confidence}%
+
+💾 DOWNLOAD LINK: ${finding.url}
+                `;
+                navigator.clipboard.writeText(details);
+                alert(details + '\n\n📋 DETAILS COPIED TO CLIPBOARD!');
+            }
+
+            updateLiveStatus() {
+                document.getElementById('responseTime').textContent = Math.floor(Math.random()*120+30) + 'ms';
+                setTimeout(() => this.updateLiveStatus(), 2000);
+            }
+        }
+
+        // SUPREME INITIALIZATION
+        const supremeHunter = new SupremeMatrixHunter();
+    </script>
+</body>
+  </html>
